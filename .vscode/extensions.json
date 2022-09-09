@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+      "ms-vscode.powershell",
+      "mhutchie.git-graph",
+      "wengerk.highlight-bad-chars",
+      "shardulm94.trailing-spaces",
+      "eamodio.gitlens",
+      "oderwat.indent-rainbow",
+      "davidanson.vscode-markdownlint",
+      "ms-azuretools.vscode-bicep"
+    ]
+  }
