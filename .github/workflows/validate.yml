@@ -17,6 +17,6 @@ jobs:
         uses: microsoft/ps-rule@v2.4.2
         with:
           modules: 'PSRule.Rules.Azure'
-          inputPath: source/webapp/
+          # inputPath: source/webapp/
           outputFormat: sarif
 
