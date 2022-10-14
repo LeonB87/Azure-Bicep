@@ -1,0 +1,3 @@
+configuration:
+  # Enable automatic expansion of bicep source files.
+  AZURE_BICEP_FILE_EXPANSION: true
