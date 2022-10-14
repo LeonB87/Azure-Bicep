@@ -1,4 +1,11 @@
 configuration:
-  # Enable automatic expansion of bicep source files.
-  AZURE_BICEP_FILE_EXPANSION: true
+  # Enable expansion for Bicep module from parameter files.
   AZURE_PARAMETER_FILE_EXPANSION: true
+
+input:
+  pathIgnore:
+  # Exclude bicepconfig.json
+  - 'bicepconfig.json'
+  # Exclude module files
+  - 'modules/**/*.bicep'
+  - '.github/*'
