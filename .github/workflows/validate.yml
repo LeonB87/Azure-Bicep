@@ -18,5 +18,10 @@ jobs:
         with:
           modules: 'PSRule.Rules.Azure'
           # inputPath: source/webapp/
-          outputFormat: sarif
+          outputFormat: Sarif
+          outputPath: reports/ps-rule-results.sarif
 
+        - name: Upload results to security tab
+          uses: github/codeql-action/upload-sarif@v2
+          with:
+            sarif_file: reports/ps-rule-results.sarif
