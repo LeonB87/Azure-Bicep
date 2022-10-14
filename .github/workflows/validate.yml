@@ -18,3 +18,5 @@ jobs:
         with:
           modules: 'PSRule.Rules.Azure'
           inputPath: source
+          outputFormat: sarif
+
