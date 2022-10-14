@@ -4,13 +4,19 @@ targetScope = 'subscription'
 param location string = 'westeurope'
 param dateTime string = utcNow('ddMMyyyyHHmm')
 
+@description('The resourcegroup to deploy the webapp to')
+@minLength(3)
+@maxLength(14)
 param resourcegroupname string
 
-param appServicePlanName string
+@description('the app service plan name')
+param appServicePlanName string = 'azapp-plan-wds-001'
 
-param appserviceName string
+@description('the app service')
+param appserviceName string = 'azapp-wds-001'
 
-param customDomainName string
+@description('optionally a name to create a managed certificate. Leave empty to not create a managed certificate.')
+param customDomainName string = 'webapp.saas.westerdijkstraat.nl'
 
 resource appResourcegroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourcegroupname

@@ -31,9 +31,26 @@ module hub_vnet '../.modules/network/vnet.bicep' = {
 
 module subnet_management '../.modules/network/subnet.bicep' = {
   scope: hub_Resourcegroup
-  name: 'subnet${dateTime}'
+  dependsOn: [
+    hub_vnet
+  ]
+  name: 'subnetManagenent${dateTime}'
   params: {
     paranetVnetName: vnetName
     subnetName: 'management'
+    subnetAddressPrefix: '10.10.1.0/24'
+  }
+}
+
+module subnet_servers '../.modules/network/subnet.bicep' = {
+  scope: hub_Resourcegroup
+  dependsOn: [
+    hub_vnet
+  ]
+  name: 'subnetServers${dateTime}'
+  params: {
+    paranetVnetName: vnetName
+    subnetName: 'servers'
+    subnetAddressPrefix: '10.10.2.0/24'
   }
 }
