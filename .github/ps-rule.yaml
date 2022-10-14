@@ -1,3 +1,4 @@
 configuration:
   # Enable automatic expansion of bicep source files.
   AZURE_BICEP_FILE_EXPANSION: true
+  AZURE_PARAMETER_FILE_EXPANSION: bool
