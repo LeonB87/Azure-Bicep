@@ -1,0 +1,512 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.11.1.770",
+      "templateHash": "15202312239666719969"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope"
+    },
+    "dateTime": {
+      "type": "string",
+      "defaultValue": "[utcNow('ddMMyyyyHHmm')]"
+    },
+    "resourcegroupname": {
+      "type": "string",
+      "maxLength": 11,
+      "minLength": 3,
+      "metadata": {
+        "description": "The resourcegroup to deploy the webapp to"
+      }
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "defaultValue": "azapp-plan-wds-001",
+      "metadata": {
+        "description": "the app service plan name"
+      }
+    },
+    "appserviceName": {
+      "type": "string",
+      "defaultValue": "azapp-wds-001",
+      "metadata": {
+        "description": "the app service"
+      }
+    },
+    "customDomainName": {
+      "type": "string",
+      "defaultValue": "webapp.saas.westerdijkstraat.nl",
+      "metadata": {
+        "description": "optionally a name to create a managed certificate. Leave empty to not create a managed certificate."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourcegroupname')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('appServicePlan-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appServicePlanName": {
+            "value": "[parameters('appServicePlanName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "appServicePlanSkuName": {
+            "value": "B1"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "5832267963038333044"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "appServicePlanName": {
+              "type": "string"
+            },
+            "appServicePlanSkuName": {
+              "type": "string",
+              "defaultValue": "D1"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('appServicePlanSkuName')]"
+              }
+            }
+          ],
+          "outputs": {
+            "appServicePlanId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('appService-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appserviceName": {
+            "value": "[parameters('appserviceName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "managedServiceIdentityType": {
+            "value": "SystemAssigned"
+          },
+          "serverFarmId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appServicePlan-{0}', parameters('dateTime')))).outputs.appServicePlanId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "6587276684067579983"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "serverFarmId": {
+              "type": "string"
+            },
+            "appserviceName": {
+              "type": "string"
+            },
+            "enabled": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "httpsOnly": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "managedServiceIdentityType": {
+              "type": "string",
+              "allowedValues": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned"
+              ]
+            },
+            "managedUserIdentity": {
+              "type": "object",
+              "defaultValue": {}
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('appserviceName')]",
+              "identity": {
+                "type": "[parameters('managedServiceIdentityType')]",
+                "userAssignedIdentities": "[if(equals(parameters('managedServiceIdentityType'), 'UserAssigned'), parameters('managedUserIdentity'), null())]"
+              },
+              "location": "[parameters('location')]",
+              "kind": "app",
+              "properties": {
+                "enabled": "[parameters('enabled')]",
+                "serverFarmId": "[parameters('serverFarmId')]",
+                "httpsOnly": "[parameters('httpsOnly')]"
+              }
+            }
+          ],
+          "outputs": {
+            "appserviceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/sites', parameters('appserviceName'))]"
+            },
+            "appserviceConfig": {
+              "type": "object",
+              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('appserviceName')))]"
+            },
+            "appserviceKind": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('appserviceName')), '2022-03-01', 'full').kind]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appServicePlan-{0}', parameters('dateTime')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('appServiceConfig-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appServiceName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appService-{0}', parameters('dateTime')))).outputs.appserviceConfig.value.name]"
+          },
+          "webConfigAlwaysOn": {
+            "value": false
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "11618552813809897588"
+            }
+          },
+          "parameters": {
+            "appServiceName": {
+              "type": "string"
+            },
+            "webConfigAlwaysOn": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "webConfigNetFrameworkVersion": {
+              "type": "string",
+              "defaultValue": "v6.0",
+              "allowedValues": [
+                "v7.0",
+                "v6.0"
+              ]
+            },
+            "webconfigFtpsState": {
+              "type": "string",
+              "defaultValue": "FtpsOnly",
+              "allowedValues": [
+                "AllAllowed",
+                "Disabled",
+                "FtpsOnly"
+              ]
+            },
+            "webconfigMinTlsVersion": {
+              "type": "string",
+              "defaultValue": "1.2",
+              "allowedValues": [
+                "1.0",
+                "1.1",
+                "1.2"
+              ]
+            },
+            "webconfigHttp20Enabled": {
+              "type": "bool",
+              "defaultValue": true
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites/config",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('appServiceName'), 'web')]",
+              "properties": {
+                "alwaysOn": "[parameters('webConfigAlwaysOn')]",
+                "ftpsState": "[parameters('webconfigFtpsState')]",
+                "netFrameworkVersion": "[parameters('webConfigNetFrameworkVersion')]",
+                "minTlsVersion": "[parameters('webconfigMinTlsVersion')]",
+                "http20Enabled": "[parameters('webconfigHttp20Enabled')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appService-{0}', parameters('dateTime')))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('customDomainName')))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('initial-HostnameBinding-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appServiceName": {
+            "value": "[parameters('appserviceName')]"
+          },
+          "customHostname": {
+            "value": "[parameters('customDomainName')]"
+          },
+          "sslState": {
+            "value": "Disabled"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "10815865500163649317"
+            }
+          },
+          "parameters": {
+            "sslState": {
+              "type": "string",
+              "allowedValues": [
+                "SniEnabled",
+                "Disabled",
+                "IpBasedEnabled"
+              ]
+            },
+            "customHostname": {
+              "type": "string"
+            },
+            "appServiceName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites/hostNameBindings",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('appServiceName'), parameters('customHostname'))]",
+              "properties": {
+                "siteName": "[parameters('customHostname')]",
+                "sslState": "[parameters('sslState')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appService-{0}', parameters('dateTime')))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('customDomainName')))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('certificate-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "serverFarmId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appServicePlan-{0}', parameters('dateTime')))).outputs.appServicePlanId.value]"
+          },
+          "customHostname": {
+            "value": "[parameters('customDomainName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "5640376455383278290"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "customHostname": {
+              "type": "string"
+            },
+            "serverFarmId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/certificates",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('customHostname')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "serverFarmId": "[parameters('serverFarmId')]",
+                "canonicalName": "[parameters('customHostname')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appServiceConfig-{0}', parameters('dateTime')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('appServicePlan-{0}', parameters('dateTime')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('initial-HostnameBinding-{0}', parameters('dateTime')))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('customDomainName')))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('activate-HostnameBinding-{0}', parameters('dateTime'))]",
+      "resourceGroup": "[parameters('resourcegroupname')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appServiceName": {
+            "value": "[parameters('appserviceName')]"
+          },
+          "customHostname": {
+            "value": "[parameters('customDomainName')]"
+          },
+          "sslState": {
+            "value": "SniEnabled"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.11.1.770",
+              "templateHash": "10815865500163649317"
+            }
+          },
+          "parameters": {
+            "sslState": {
+              "type": "string",
+              "allowedValues": [
+                "SniEnabled",
+                "Disabled",
+                "IpBasedEnabled"
+              ]
+            },
+            "customHostname": {
+              "type": "string"
+            },
+            "appServiceName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites/hostNameBindings",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('appServiceName'), parameters('customHostname'))]",
+              "properties": {
+                "siteName": "[parameters('customHostname')]",
+                "sslState": "[parameters('sslState')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourcegroupname'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourcegroupname')), 'Microsoft.Resources/deployments', format('certificate-{0}', parameters('dateTime')))]"
+      ]
+    }
+  ]
+}

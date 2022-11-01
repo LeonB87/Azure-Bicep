@@ -46,9 +46,12 @@ module appService '../.modules/webapp/appService.bicep' = {
 
 module appserviceConfig '../.modules/webapp/appServiceConfig.bicep' = {
   scope: appResourcegroup
+  dependsOn: [
+    appService
+  ]
   name: 'appServiceConfig-${dateTime}'
   params: {
-    appServiceName: appService.outputs.appserviceConfig.name
+    appServiceName: appserviceName
     webConfigAlwaysOn: false
   }
 }
