@@ -348,3 +348,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+source/vms in availability set/main.parameters.local.json
+source/kms_route_table/main.parameters.local.json
