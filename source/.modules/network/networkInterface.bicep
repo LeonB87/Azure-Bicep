@@ -20,6 +20,11 @@ resource publicIP 'Microsoft.Network/publicIPAddresses@2022-05-01' = if (require
   properties: {
     publicIPAllocationMethod: 'static'
   }
+  zones: [
+    2
+    3
+    1
+  ]
   sku: {
     name: 'Standard'
   }
