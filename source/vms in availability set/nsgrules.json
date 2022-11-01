@@ -1,5 +1,19 @@
 [
   {
+    "name": "AllowApplicationInbound",
+    "properties": {
+      "description": "Allow internal web traffic into application.",
+      "access": "Allow",
+      "direction": "Inbound",
+      "priority": 300,
+      "protocol": "Tcp",
+      "sourcePortRange": "*",
+      "sourceAddressPrefix": "10.0.0.0/16",
+      "destinationPortRange": "443",
+      "destinationAddressPrefix": "VirtualNetwork"
+    }
+  },
+  {
     "name": "DenyAllInbound",
     "properties": {
       "description": "Deny all other inbound traffic.",
