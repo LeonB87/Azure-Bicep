@@ -1,18 +1,5 @@
 [
   {
-    "name": "DenyAllOutbound",
-    "properties": {
-      "protocol": "*",
-      "sourcePortRange": "*",
-      "destinationPortRanges": ["3389", "22"],
-      "access": "Deny",
-      "priority": 200,
-      "direction": "Outbound",
-      "sourceAddressPrefix": "VirtualNetwork",
-      "destinationAddressPrefix": "*"
-    }
-  },
-  {
     "name": "DenyAllInbound",
     "properties": {
       "description": "Deny all other inbound traffic.",
@@ -23,6 +10,19 @@
       "sourcePortRange": "*",
       "sourceAddressPrefix": "*",
       "destinationPortRange": "*",
+      "destinationAddressPrefix": "*"
+    }
+  },
+  {
+    "name": "DenyAllOutbound",
+    "properties": {
+      "protocol": "*",
+      "sourcePortRange": "*",
+      "destinationPortRanges": ["3389", "22"],
+      "access": "Deny",
+      "priority": 200,
+      "direction": "Outbound",
+      "sourceAddressPrefix": "VirtualNetwork",
       "destinationAddressPrefix": "*"
     }
   }
