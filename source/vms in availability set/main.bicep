@@ -11,8 +11,14 @@ param resourcegroupname string
 
 // vms
 param availabilitySetName string
+
+@minLength(1)
+@maxLength(64)
 param vm001Name string
 param vm001OSName string
+
+@minLength(1)
+@maxLength(64)
 param vm002Name string
 param vm002OSName string
 param vm002internalIP string

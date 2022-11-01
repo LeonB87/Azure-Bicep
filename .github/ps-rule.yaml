@@ -13,3 +13,4 @@ input:
 rule:
   exclude:
   - Azure.Resource.UseTags
+  - Azure.VM.UseHybridUseBenefit

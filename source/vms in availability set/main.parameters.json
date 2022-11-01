@@ -3,37 +3,37 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourcegroupname": {
-      "value": ""
+      "value": "rg-vms"
     },
     "availabilitySetName": {
-      "value": ""
+      "value": "azavs-001"
     },
     "vm001Name": {
-      "value": ""
+      "value": "wds-vm-001"
     },
     "vm001OSName": {
-      "value": ""
+      "value": "wds-vm-001"
     },
     "vm002Name": {
-      "value": ""
+      "value": "wds-vm-002"
     },
     "vm002OSName": {
-      "value": ""
+      "value": "wds-vm-002"
     },
     "vm002internalIP": {
-      "value": ""
+      "value": "10.0.0.5"
     },
     "virtualnetworkName": {
-      "value": ""
+      "value": "vnet-wds-001"
     },
     "virtualNetworkAddressPrefix": {
-      "value": ""
+      "value": "10.0.0.0/16"
     },
     "subnetName": {
-      "value": ""
+      "value": "default"
     },
     "subnetPrefix": {
-      "value": ""
+      "value": "10.0.0.0/24"
     }
   }
 }
