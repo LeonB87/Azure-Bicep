@@ -9,6 +9,7 @@ input:
   # Exclude module files
   - '.modules/**/*.bicep'
   - '.github/*'
+  - 'webapp/*'
 
 rule:
   exclude:
