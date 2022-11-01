@@ -3,7 +3,7 @@ param name string
 
 param nsgRules array = [
   {
-    name: 'deny-management-outbound'
+    name: 'deny-hop-outbound'
     properties: {
       priority: 200
       access: 'Deny'
