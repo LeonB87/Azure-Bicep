@@ -1,33 +1,5 @@
 [
   {
-    "name": "IN_VNET_Deny",
-    "properties": {
-      "access": "Deny",
-      "description": "Deny default VNET traffic",
-      "destinationAddressPrefix": "VirtualNetwork",
-      "destinationPortRange": "*",
-      "direction": "Inbound",
-      "priority": 4000,
-      "protocol": "*",
-      "sourceAddressPrefix": "*",
-      "sourcePortRange": "*"
-    }
-  },
-  {
-    "name": "IN_HTTPS_Allow",
-    "properties": {
-      "access": "Allow",
-      "description": "Allow https",
-      "destinationAddressPrefix": "VirtualNetwork",
-      "destinationPortRange": "443",
-      "direction": "Inbound",
-      "priority": 1000,
-      "protocol": "*",
-      "sourceAddressPrefix": "*",
-      "sourcePortRange": "*"
-    }
-  },
-  {
     "name": "DenyAllOutbound",
     "properties": {
       "protocol": "*",
