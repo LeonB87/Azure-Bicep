@@ -6,7 +6,7 @@ param dateTime string = utcNow('ddMMyyyyHHmm')
 
 @description('The resourcegroup to deploy the webapp to')
 @minLength(3)
-@maxLength(14)
+@maxLength(13)
 param resourcegroupname string
 
 @description('the app service plan name')
